@@ -14,6 +14,7 @@ user { 'teleivo':
   user                => 'teleivo',
   create_bash_aliases => true,
   create_gitconfig    => true,
+  manage_gitprompt    => true,
   require             => [
     Package['git'],
     User['teleivo'],

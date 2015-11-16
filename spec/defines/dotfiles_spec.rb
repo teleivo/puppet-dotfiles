@@ -24,6 +24,7 @@ describe 'dotfiles', :type => :define do
     }
     it { is_expected.not_to contain_file($user_home + "/.bash_aliases") }
     it { is_expected.not_to contain_file($user_home + "/.gitconfig") }
+    it { is_expected.not_to contain_file($user_home + "/.bashrc_git") }
 
     it 'should not compile when user is not a string' do
       params.merge!({'user' => true})
@@ -50,7 +51,7 @@ describe 'dotfiles', :type => :define do
         )
     end
 
-    it 'should not compile when when create_gitconfig is not true or false' do
+    it 'should not compile when create_gitconfig is not true or false' do
       params.merge!({'create_gitconfig' => 'invalid_val'})
       should_not compile
     end
@@ -62,6 +63,28 @@ describe 'dotfiles', :type => :define do
           'ensure' => 'link',
           'owner'  => $user,
           'target' => $dotfiles_path + "/gitconfig",
+        )
+    end
+
+    it 'should not compile when manage_gitprompt is not true or false' do
+      params.merge!({'manage_gitprompt' => 'invalid_val'})
+      should_not compile
+    end
+    it 'should create .bashrc_git symlink and source it in bashrc with manage_gitprompt set to true' do
+      params.merge!({'manage_gitprompt' => true})
+
+      is_expected.to contain_file($user_home + "/.bashrc_git")
+        .with(
+          'ensure' => 'link',
+          'owner'  => $user,
+          'target' => $dotfiles_path + "/bashrc_git",
+        )
+
+      is_expected.to contain_file_line($user + "_bashrc_gitprompt")
+        .with(
+          'ensure' => 'present',
+          'path'   => $user_home + "/.bashrc",
+          'line'   => '[ -f ~/.bashrc_git ] && . ~/.bashrc_git',
         )
     end
   end

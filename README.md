@@ -74,6 +74,12 @@ Specifies whether symlink '$user_home/.gitconfig -> $user_home/.dotfiles/gitconf
 Valid options: 'true', 'false'.
 Defaults to 'false'.
 
+##### `manage_gitprompt`
+
+Specifies whether symlink '$user_home/.bashrc_git -> $user_home/.dotfiles/bashrc_git' is created and $user_home/.bashrc_git is sourced in $user_home/.bashrc.
+Valid options: 'true', 'false'.
+Defaults to 'false'.
+
 ## Limitations
 
 This module only deploys a .dotfiles directory from repository [teleivo/dotfiles](https://github.com/teleivo/dotfiles).  
