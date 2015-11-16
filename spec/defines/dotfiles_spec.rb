@@ -22,15 +22,23 @@ describe 'dotfiles', :type => :define do
         'user'     => $user,
       )
     }
-    it { 
-      is_expected.not_to contain_file($user_home + "/.bash_aliases")
-    }
+    it { is_expected.not_to contain_file($user_home + "/.bash_aliases") }
+    it { is_expected.not_to contain_file($user_home + "/.gitconfig") }
 
-    it 'should report an error when create_bash_aliases is not true or false' do
-      params.merge!({'create_bash_aliases' => 'invalid_val'})
-      expect { catalogue }.to raise_error(Puppet::Error)
+    it 'should not compile when user is not a string' do
+      params.merge!({'user' => true})
+      should_not compile
     end
 
+    it 'should not compile when user_home is not an absolute path' do
+      params.merge!({'user_home' => 'home/teleivo'})
+      should_not compile
+    end
+
+    it 'should not compile when create_bash_aliases is not true or false' do
+      params.merge!({'create_bash_aliases' => 'invalid_val'})
+      should_not compile
+    end
     it 'should create .bash_aliases symlink with create_bash_aliases set to true' do
       params.merge!({'create_bash_aliases' => true})
 
@@ -42,11 +50,10 @@ describe 'dotfiles', :type => :define do
         )
     end
 
-    it 'should report an error when create_gitconfig is not true or false' do
+    it 'should not compile when when create_gitconfig is not true or false' do
       params.merge!({'create_gitconfig' => 'invalid_val'})
-      expect { catalogue }.to raise_error(Puppet::Error)
+      should_not compile
     end
-
     it 'should create .gitconfig symlink with create_gitconfig set to true' do
       params.merge!({'create_gitconfig' => true})
 
