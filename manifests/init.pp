@@ -3,10 +3,12 @@ define dotfiles (
   $user,
   $user_home = $title,
   $create_bash_aliases = false,
+  $create_gitconfig = false,
 ) {
   validate_string($user)
   validate_absolute_path($user_home)
   validate_bool($create_bash_aliases)
+  validate_bool($create_gitconfig)
 
   $dotfiles_path = "${user_home}/.dotfiles"
   vcsrepo { $dotfiles_path:
@@ -21,6 +23,14 @@ define dotfiles (
       ensure => link,
       owner  => $user,
       target => "${dotfiles_path}/bash_aliases",
+    }
+  }
+
+  if ($create_gitconfig) {
+    file { "${user_home}/.gitconfig":
+      ensure => link,
+      owner  => $user,
+      target => "${dotfiles_path}/gitconfig",
     }
   }
 }

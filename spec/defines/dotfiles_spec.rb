@@ -41,5 +41,21 @@ describe 'dotfiles', :type => :define do
           'target' => $dotfiles_path + "/bash_aliases",
         )
     end
+
+    it 'should report an error when create_gitconfig is not true or false' do
+      params.merge!({'create_gitconfig' => 'invalid_val'})
+      expect { catalogue }.to raise_error(Puppet::Error)
+    end
+
+    it 'should create .gitconfig symlink with create_gitconfig set to true' do
+      params.merge!({'create_gitconfig' => true})
+
+      is_expected.to contain_file($user_home + "/.gitconfig")
+        .with(
+          'ensure' => 'link',
+          'owner'  => $user,
+          'target' => $dotfiles_path + "/gitconfig",
+        )
+    end
   end
 end

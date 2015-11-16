@@ -64,7 +64,13 @@ Defaults to $title.
 
 ##### `create_bash_aliases`
 
-Specifies whether symlink '.bash_aliases -> .dotfiles/bash_aliases' is created.
+Specifies whether symlink '$user_home/.bash_aliases -> $user_home/.dotfiles/bash_aliases' is created.
+Valid options: 'true', 'false'.
+Defaults to 'false'.
+
+##### `create_gitconfig`
+
+Specifies whether symlink '$user_home/.gitconfig -> $user_home/.dotfiles/gitconfig' is created.
 Valid options: 'true', 'false'.
 Defaults to 'false'.
 
