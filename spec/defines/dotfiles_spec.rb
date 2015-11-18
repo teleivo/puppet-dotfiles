@@ -8,84 +8,130 @@ describe 'dotfiles', :type => :define do
 
     let(:title) { $user_home }
 
-    let(:params) {
+    let(:valid_required_params) do
       { 
-        'user' => $user,
+        :user => $user,
       }
-    }
-
-    it { is_expected.to contain_vcsrepo($dotfiles_path)
-      .with(
-        'ensure'   => 'present',
-        'provider' => 'git',
-        'source'   => 'https://github.com/teleivo/dotfiles.git',
-        'user'     => $user,
-      )
-    }
-    it { is_expected.not_to contain_file($user_home + "/.bash_aliases") }
-    it { is_expected.not_to contain_file($user_home + "/.gitconfig") }
-    it { is_expected.not_to contain_file($user_home + "/.bashrc_git") }
-
-    it 'should not compile when user is not a string' do
-      params.merge!({'user' => true})
-      should_not compile
     end
 
-    it 'should not compile when user_home is not an absolute path' do
-      params.merge!({'user_home' => 'home/teleivo'})
-      should_not compile
-    end
-
-    it 'should not compile when create_bash_aliases is not true or false' do
-      params.merge!({'create_bash_aliases' => 'invalid_val'})
-      should_not compile
-    end
-    it 'should create .bash_aliases symlink with create_bash_aliases set to true' do
-      params.merge!({'create_bash_aliases' => true})
-
-      is_expected.to contain_file($user_home + "/.bash_aliases")
+    context 'with only required parameters given' do
+      let :params do
+        valid_required_params
+      end
+      it { is_expected.to contain_vcsrepo($dotfiles_path)
         .with(
-          'ensure' => 'link',
-          'owner'  => $user,
-          'target' => $dotfiles_path + "/bash_aliases",
+          'ensure'   => 'present',
+          'provider' => 'git',
+          'source'   => 'https://github.com/teleivo/dotfiles.git',
+          'user'     => $user,
         )
+      }
+      it { is_expected.not_to contain_file($user_home + "/.bash_aliases") }
+      it { is_expected.not_to contain_file($user_home + "/.gitconfig") }
+      it { is_expected.not_to contain_file($user_home + "/.bashrc_git") }
     end
 
-    it 'should not compile when create_gitconfig is not true or false' do
-      params.merge!({'create_gitconfig' => 'invalid_val'})
-      should_not compile
+    context 'with invalid parameters' do
+      describe 'when user is not a string' do
+        let :params do
+          valid_required_params.merge({
+            :user => true,
+          })
+        end
+        it { should_not compile }
+      end
+
+      describe 'when user_home is not an absolute path' do
+        let :params do
+          valid_required_params.merge({
+            :user_home => 'home/teleivo',
+          })
+        end
+        it { should_not compile }
+      end
+
+      describe 'when create_bash_aliases is not true or false' do
+        let :params do
+          valid_required_params.merge({
+            :create_bash_aliases => 'invalid_val',
+          })
+        end
+        it { should_not compile }
+      end
+
+      describe 'when create_gitconfig is not true or false' do
+        let :params do
+          valid_required_params.merge({
+            :create_gitconfig => 'invalid_val',
+          })
+        end
+        it { should_not compile }
+      end
+
+      describe 'when manage_gitprompt is not true or false' do
+        let :params do
+          valid_required_params.merge({
+            :manage_gitprompt => 'invalid_val',
+          })
+        end
+        it { should_not compile }
+      end
     end
-    it 'should create .gitconfig symlink with create_gitconfig set to true' do
-      params.merge!({'create_gitconfig' => true})
+    
+    context 'with required parameters and custom parameters given' do
+      describe 'with create_bash_aliases = true' do
+        let :params do
+          valid_required_params.merge({
+            :create_bash_aliases => true,
+          })
+        end
 
-      is_expected.to contain_file($user_home + "/.gitconfig")
-        .with(
-          'ensure' => 'link',
-          'owner'  => $user,
-          'target' => $dotfiles_path + "/gitconfig",
-        )
-    end
+        it { is_expected.to contain_file($user_home + "/.bash_aliases")
+          .with(
+            'ensure' => 'link',
+            'owner'  => $user,
+            'target' => $dotfiles_path + "/bash_aliases",
+          )
+        }
+      end
 
-    it 'should not compile when manage_gitprompt is not true or false' do
-      params.merge!({'manage_gitprompt' => 'invalid_val'})
-      should_not compile
-    end
-    it 'should create .bashrc_git symlink and source it in bashrc with manage_gitprompt set to true' do
-      params.merge!({'manage_gitprompt' => true})
+      describe 'with create_gitconfig = true' do
+        let :params do
+          valid_required_params.merge({
+            :create_gitconfig => true,
+          })
+        end
 
-      is_expected.to contain_file($user_home + "/.bashrc_git")
-        .with(
-          'ensure' => 'link',
-          'owner'  => $user,
-          'target' => $dotfiles_path + "/bashrc_git",
-        )
+        it { is_expected.to contain_file($user_home + "/.gitconfig")
+          .with(
+            'ensure' => 'link',
+            'owner'  => $user,
+            'target' => $dotfiles_path + "/gitconfig",
+          )
+        }
+      end
 
-      is_expected.to contain_file_line($user + "_bashrc_gitprompt")
-        .with(
-          'ensure' => 'present',
-          'path'   => $user_home + "/.bashrc",
-          'line'   => '[ -f ~/.bashrc_git ] && . ~/.bashrc_git',
-        )
+      describe 'with manage_gitprompt = true' do
+        let :params do
+          valid_required_params.merge({
+            :manage_gitprompt => true,
+          })
+        end
+        it { is_expected.to contain_file($user_home + "/.bashrc_git")
+          .with(
+            'ensure' => 'link',
+            'owner'  => $user,
+            'target' => $dotfiles_path + "/bashrc_git",
+          )
+        }
+        it { is_expected.to contain_file_line($user + "_bashrc_gitprompt")
+          .with(
+            'ensure' => 'present',
+            'path'   => $user_home + "/.bashrc",
+            'line'   => '[ -f ~/.bashrc_git ] && . ~/.bashrc_git',
+          )
+        }
+      end
     end
   end
 end
