@@ -20,7 +20,7 @@ describe 'dotfiles', :type => :define do
       end
       it { is_expected.to contain_vcsrepo($dotfiles_path)
         .with(
-          'ensure'   => 'present',
+          'ensure'   => 'latest',
           'provider' => 'git',
           'source'   => 'https://github.com/teleivo/dotfiles.git',
           'user'     => $user,

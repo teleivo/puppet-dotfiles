@@ -14,7 +14,7 @@ define dotfiles (
 
   $dotfiles_path = "${user_home}/.dotfiles"
   vcsrepo { $dotfiles_path:
-    ensure   => present,
+    ensure   => latest,
     provider => git,
     source   => 'https://github.com/teleivo/dotfiles.git',
     user     => $user,
