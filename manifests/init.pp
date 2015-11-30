@@ -22,31 +22,35 @@ define dotfiles (
   
   if ($create_bash_aliases) {
     file { "${user_home}/.bash_aliases":
-      ensure => link,
-      owner  => $user,
-      target => "${dotfiles_path}/bash_aliases",
+      ensure  => link,
+      owner   => $user,
+      target  => "${dotfiles_path}/bash_aliases",
+      require => Vcsrepo[$dotfiles_path],
     }
   }
 
   if ($create_gitconfig) {
     file { "${user_home}/.gitconfig":
-      ensure => link,
-      owner  => $user,
-      target => "${dotfiles_path}/gitconfig",
+      ensure  => link,
+      owner   => $user,
+      target  => "${dotfiles_path}/gitconfig",
+      require => Vcsrepo[$dotfiles_path],
     }
   }
 
   if ($manage_gitprompt) {
     file { "${user_home}/.bashrc_git":
-      ensure => link,
-      owner  => $user,
-      target => "${dotfiles_path}/bashrc_git",
+      ensure  => link,
+      owner   => $user,
+      target  => "${dotfiles_path}/bashrc_git",
+      require => Vcsrepo[$dotfiles_path],
     }
 
     file_line { "${user}_bashrc_gitprompt":
-      ensure => present,
-      path   => "${user_home}/.bashrc",
-      line   => '[ -f ~/.bashrc_git ] && . ~/.bashrc_git',
+      ensure  => present,
+      path    => "${user_home}/.bashrc",
+      line    => '[ -f ~/.bashrc_git ] && . ~/.bashrc_git',
+      require => File["${user_home}/.bashrc_git"],
     }
   }
 }
